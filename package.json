@@ -1,0 +1,22 @@
+{
+  "name": "arbi-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "nodemon":"node src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "ccxt": "^4.5.68",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.17.0",
+    "nodemon": "^3.1.14",
+    "ws": "^8.21.1"
+  }
+}
