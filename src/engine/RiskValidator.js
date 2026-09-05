@@ -23,7 +23,9 @@ class RiskValidator {
     // ── Stop-loss check ────────────────────────────────────
     // Ye check meetsThreshold se pehle isliye hai taaki loss-making trade ka
     // reason clearly "stop-loss" log ho, na ki generic "below threshold".
-    const maxLossPct = Math.abs(config.risk.maxLossPct);
+    // evaluatedOpportunity.maxLossPct = symbol-specific override (set by
+    // index.js from config.symbols[i].maxLossPct); falls back to global.
+    const maxLossPct = Math.abs(evaluatedOpportunity.maxLossPct ?? config.risk.maxLossPct);
     if (evaluatedOpportunity.netProfitPct <= -maxLossPct) {
       return {
         ok: false,

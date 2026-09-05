@@ -31,13 +31,18 @@ class Executor {
       return { ok: false, reason: 'Stop-loss guard: spread no longer crossed on re-check' };
     }
 
-    const freshEvaluated = calculateNetProfit(freshOpportunity, evaluatedOpportunity.tradeSizeUSD);
+    const freshEvaluated = calculateNetProfit(freshOpportunity, {
+      tradeSizeUSD: evaluatedOpportunity.tradeSizeUSD,
+      minRequiredProfitPct: evaluatedOpportunity.minRequiredProfitPct,
+    });
+    // Carry the symbol-specific stop-loss override through to the re-check.
+    freshEvaluated.maxLossPct = evaluatedOpportunity.maxLossPct;
 
     if (this.riskValidator) {
       const verdict = this.riskValidator.validate(freshEvaluated, binTicker, hlTicker);
       if (!verdict.ok) return { ok: false, reason: verdict.reason, fresh: freshEvaluated };
     } else {
-      const maxLossPct = Math.abs(config.risk.maxLossPct);
+      const maxLossPct = Math.abs(evaluatedOpportunity.maxLossPct ?? config.risk.maxLossPct);
       if (freshEvaluated.netProfitPct <= -maxLossPct) {
         return {
           ok: false,

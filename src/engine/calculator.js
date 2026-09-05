@@ -5,8 +5,19 @@ const config = require('../../config');
  * and computes the NET expected profit after fees & estimated slippage —
  * mirroring the "Profitability Calculator" step in the engine flow.
  */
-function calculateNetProfit(opportunity, tradeSizeUSD = config.tradeSizeUSD) {
+/**
+ * Takes a raw opportunity (from scanner.js) and computes the NET expected
+ * profit after fees & estimated slippage — mirroring the "Profitability
+ * Calculator" step in the engine flow.
+ *
+ * opts.tradeSizeUSD / opts.minRequiredProfitPct let the caller pass in a
+ * SYMBOL-SPECIFIC trade size and threshold (e.g. from config.symbols[i]).
+ * If omitted, falls back to the global config defaults.
+ */
+function calculateNetProfit(opportunity, opts = {}) {
   const { fees } = config;
+  const tradeSizeUSD = opts.tradeSizeUSD ?? config.tradeSizeUSD;
+  const minRequiredProfitPct = opts.minRequiredProfitPct ?? config.minRequiredProfitPct;
 
   const buyFeeUSD = tradeSizeUSD * (fees.binanceTakerPct / 100);
   const sellFeeUSD = tradeSizeUSD * (fees.hyperliquidTakerPct / 100);
@@ -22,6 +33,7 @@ function calculateNetProfit(opportunity, tradeSizeUSD = config.tradeSizeUSD) {
   return {
     ...opportunity,
     tradeSizeUSD,
+    minRequiredProfitPct,
     grossProfitUSD: round(grossProfitUSD),
     costs: {
       buyFeeUSD: round(buyFeeUSD),
@@ -32,7 +44,7 @@ function calculateNetProfit(opportunity, tradeSizeUSD = config.tradeSizeUSD) {
     },
     netProfitUSD: round(netProfitUSD),
     netProfitPct: round(netProfitPct, 4),
-    meetsThreshold: netProfitPct > config.minRequiredProfitPct,
+    meetsThreshold: netProfitPct > minRequiredProfitPct,
   };
 }
 
